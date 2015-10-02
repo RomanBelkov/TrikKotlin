@@ -67,6 +67,17 @@ public enum class AnalogPorts {
     }
 }
 
+public enum class VideoSource {
+    USB, VP1, VP2;
+
+    fun SensorPath(): String {
+        when(this) {
+            USB  -> return "/etc/init.d/mxn-sensor-webcam.sh"
+            else -> return "/etc/init.d/mxn-sensor-ov7670.sh"
+        }
+    }
+}
+
 public enum class Ports {
 
 }
