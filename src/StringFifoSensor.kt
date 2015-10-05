@@ -10,7 +10,7 @@ import kotlin.concurrent.thread
  */
 
 fun <T> WaitForObservable(observable: ObservableK<T>): T? {
-    val semaphore = Semaphore(1)
+    val semaphore = Semaphore(0)
     var result: T? = null
     var x: Closeable? = null
     val threadHandle = thread(start = false) {
@@ -56,7 +56,7 @@ abstract class StringFifoSensor<T>(val path: String) {
         return threadHandler //thread should be a property
     }
 
-    abstract fun Parse(string: String): Optional<T>
+    abstract fun Parse(text: String): Optional<T>
 
     open fun Start() {
         if (isStarted == true) throw Exception("Calling Start() second time is prohibited")

@@ -26,12 +26,20 @@ fun main(args: Array<String>) {
         servo.setPower(-80)
         Thread.sleep(2000)*/
 
-    I2cTrik.Open()
+/*    I2cTrik.Open()
     val analogSensor = AnalogSensor(AnalogPorts.A3)
     println(analogSensor.Read())
     Thread.sleep(2000)
     println(analogSensor.Read())
-    I2cTrik.Close()
+    I2cTrik.Close()*/
+
+    val video = MxNSensor(VideoSource.VP2)
+    video.Start()
+    video.gridSize = Pair(1, 1)
+    Thread.sleep(2000)
+    //println()
+    Thread.sleep(2000)
+    println(video.Read())
 
     /*    val fd = I2cNative.openBus("/dev/i2c-2", 0x48)
         println(I2cNative.readByte(fd, 0x23))
