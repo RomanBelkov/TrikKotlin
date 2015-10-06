@@ -1,6 +1,10 @@
+import sun.nio.cs.US_ASCII
 import java.io.BufferedOutputStream
 import java.io.Closeable
 import java.io.FileOutputStream
+import java.io.FileWriter
+import java.nio.channels.FileChannel
+import java.nio.charset.Charset
 import java.util.*
 
 /**
@@ -12,29 +16,34 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
 
     private fun script(command: String) = Shell.Send("$scriptPath $command")
 
-    var stream: FileOutputStream? = null
+    //var stream: FileOutputStream? = null
+    var stream: FileWriter? = null
     //var commandFifo: BufferedOutputStream? = null //not needed
     var isCancelled = false
     var gridSize = Pair(3, 3)
         get() = field
         set(p) {
-            field = p
             if (stream == null) throw Exception("Missing Start() call before changing grid size")
-            stream!!.write("mxn ${p.first} ${p.second}".toByteArray())
+            stream?.write("mxn ${p.first} ${p.second}\n")
+            stream?.flush()
+            field = p
         }
 
     override fun Start() {
+        stream = FileWriter(commandPath, true)
         script("start")
         super.Start()
 
-        stream = FileOutputStream(commandPath)
+        //stream = FileOutputStream(commandPath)
+
+
         //commandFifo = BufferedOutputStream(stream)
 
     }
 
     override fun Stop() {   //revise .NET code of this method (forgetting to close stream?)
         super.Stop()
-        stream!!.close()
+        stream?.close()
         //commandFifo?.close()
         script("stop")
     }
