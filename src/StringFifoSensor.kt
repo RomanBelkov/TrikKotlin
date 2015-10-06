@@ -9,7 +9,7 @@ import kotlin.concurrent.thread
  * Created by Roman Belkov on 28.09.15.
  */
 
-fun <T> WaitForObservable(observable: ObservableK<T>): T? {
+fun <T> WaitForObservable(observable: Observable<T>): T? {
     val semaphore = Semaphore(0)
     var result: T? = null
     var x: Closeable? = null
@@ -20,7 +20,7 @@ fun <T> WaitForObservable(observable: ObservableK<T>): T? {
             throw UnsupportedOperationException()
         }
 
-        override fun onError(e: Throwable?) {
+        override fun onError(e: Throwable) {
             throw UnsupportedOperationException()
         }
 
@@ -36,11 +36,10 @@ fun <T> WaitForObservable(observable: ObservableK<T>): T? {
     return result
 }
 
-abstract class StringFifoSensor<T>(val path: String) {
-    val notifier = Notifier<T>()
-
+abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
+    private val notifier = Notifier<T>()
     private var isStarted = false
-    //private val latestValue = Optional<T>.empty()
+    private var isClosing = false
 
     private fun loop(): Thread {
         val streamReader = BufferedReader(FileReader(path))
@@ -51,15 +50,16 @@ abstract class StringFifoSensor<T>(val path: String) {
             reading(streamReader)
         }
 
-        val threadHandler = thread { reading(streamReader) }
+        val threadHandler = thread { if (isClosing == false) reading(streamReader) }
 
-        return threadHandler //thread should be a property
+        return threadHandler
     }
 
     abstract fun Parse(text: String): Optional<T>
 
     open fun Start() {
         if (isStarted == true) throw Exception("Calling Start() second time is prohibited")
+        //handler = loop()
         loop()
         isStarted = true
     }
@@ -75,5 +75,10 @@ abstract class StringFifoSensor<T>(val path: String) {
     }
 
     fun ToObservable() = notifier.Publish()
+
+    override fun close() {
+        isClosing = true
+        Stop()
+    }
 
 }

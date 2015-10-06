@@ -1,3 +1,5 @@
+import java.io.File
+
 /**
  * Created by Roman Belkov on 06.07.2015.
  */
@@ -35,11 +37,19 @@ fun main(args: Array<String>) {
 
     val video = MxNSensor(VideoSource.VP2)
     video.Start()
+    //Thread.sleep(2000)
     video.gridSize = Pair(1, 1)
+    println(video.gridSize)
+    //video.gridSize = Pair(1, 1)
+    val value = video.Read()
     Thread.sleep(2000)
-    //println()
+    println(value?.get(1))
+    //File("/run/mxn-sensor.in.fifo").writeText("mxn 1 1")
     Thread.sleep(2000)
-    println(video.Read())
+    println(video.Read()?.size())
+    Thread.sleep(2000)
+    val obs = video.ToObservable()
+    obs.Subscribe { println(it) }
 
     /*    val fd = I2cNative.openBus("/dev/i2c-2", 0x48)
         println(I2cNative.readByte(fd, 0x23))

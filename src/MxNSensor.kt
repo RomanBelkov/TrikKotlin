@@ -10,15 +10,13 @@ import java.util.*
 /**
  * Created by Roman Belkov on 02.10.15.
  */
-class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: String): StringFifoSensor<Array<Int>>(sensorPath), AutoCloseable {
+class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: String): StringFifoSensor<Array<Int>>(sensorPath), Closeable, AutoCloseable {
 
     constructor(videoSource: VideoSource) : this(videoSource.SensorPath(), "/run/mxn-sensor.in.fifo", "/run/mxn-sensor.out.fifo")
 
     private fun script(command: String) = Shell.Send("$scriptPath $command")
 
-    //var stream: FileOutputStream? = null
     var stream: FileWriter? = null
-    //var commandFifo: BufferedOutputStream? = null //not needed
     var isCancelled = false
     var gridSize = Pair(3, 3)
         get() = field
@@ -33,21 +31,13 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
         stream = FileWriter(commandPath, true)
         script("start")
         super.Start()
-
-        //stream = FileOutputStream(commandPath)
-
-
-        //commandFifo = BufferedOutputStream(stream)
-
     }
 
     override fun Stop() {   //revise .NET code of this method (forgetting to close stream?)
         super.Stop()
         stream?.close()
-        //commandFifo?.close()
         script("stop")
     }
-
 
     override fun Parse(text: String): Optional<Array<Int>> {
         var parsedText = text.split(" "). drop(1). filter { it != "" }
@@ -58,7 +48,6 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
     override fun close() {
         isCancelled = true
         Stop()
-        //commandFifo?.close()
         stream?.close()
         //super.close()
 
