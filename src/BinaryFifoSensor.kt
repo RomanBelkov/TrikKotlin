@@ -52,7 +52,7 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
         return WaitForObservable(notifier.Publish())
     }
 
-    open fun Stop() {
+    fun Stop() {
         notifier.onCompleted()
         isStarted = false
     }
