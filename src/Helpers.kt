@@ -18,9 +18,8 @@ object Shell {
     }
 }
 
-
 public object Helpers {
-    public fun limit(minValue: Int, maxValue: Int, value: Int): Int {
+    public fun limit<T: Comparable<T>>(minValue: T, maxValue: T, value: T): T {
         when {
             value > maxValue -> return maxValue
             value < minValue -> return minValue
