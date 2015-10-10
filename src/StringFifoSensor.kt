@@ -4,40 +4,15 @@ import java.io.Closeable
 import java.util.Optional
 import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
+import rx.Subscriber
+import rx.subjects.PublishSubject
 
 /**
  * Created by Roman Belkov on 28.09.15.
  */
 
-fun <T> WaitForObservable(observable: Observable<T>): T? {
-    val semaphore = Semaphore(0)
-    var result: T? = null
-    var x: Closeable? = null
-    val threadHandle = thread(start = false) {
-        //semaphore.acquire()
-        x = observable.Subscribe(object: Observer<T> {
-        override fun onCompleted() {
-            throw UnsupportedOperationException()
-        }
-
-        override fun onError(e: Throwable) {
-            throw UnsupportedOperationException()
-        }
-
-        override fun onNext(t: T) {
-            result = t
-            x?.close()
-            semaphore.release()
-        }
-    }) }
-
-    threadHandle.start()
-    semaphore.acquire()
-    return result
-}
-
 abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
-    private val notifier = Notifier<T>()
+    private val subject = PublishSubject.create<T>()
     private var isStarted = false
     private var isClosing = false
 
@@ -46,7 +21,8 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
 
         tailrec fun reading (streamReader: BufferedReader) {
             val line = streamReader.readLine()
-            Parse(line).ifPresent { notifier.onNext(it) }
+            Parse(line).ifPresent { subject.onNext(it) }
+
             reading(streamReader)
         }
 
@@ -59,22 +35,38 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
 
     open fun Start() {
         if (isStarted == true) throw Exception("Calling Start() second time is prohibited")
-        //handler = loop()
         loop()
         isStarted = true
     }
 
     fun Read(): T? {
         if (isStarted == false) throw Exception("Calling Read() before Start() is prohibited")
-        return WaitForObservable(notifier.Publish())
+        val semaphore = Semaphore(0) //TODO to monitor
+        var result: T? = null
+
+        thread { subject.asObservable().subscribe(object : Subscriber<T>() {
+            override fun onNext(p0: T) {
+                result = p0
+                this.unsubscribe()
+                semaphore.release()
+            }
+
+            override fun onCompleted() = Unit
+
+            override fun onError(p0: Throwable) = throw p0
+
+        }) }
+
+        semaphore.acquire()
+        return result
     }
 
     open fun Stop() {
-        notifier.onCompleted()
+        subject.onCompleted()
         isStarted = false
     }
 
-    fun ToObservable() = notifier.Publish()
+    fun ToObservable() = subject.asObservable()
 
     override fun close() {
         isClosing = true
