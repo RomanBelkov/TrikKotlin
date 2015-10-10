@@ -12,12 +12,12 @@ import java.util.*
  */
 class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: String): StringFifoSensor<Array<Int>>(sensorPath), Closeable, AutoCloseable {
 
-    constructor(videoSource: VideoSource) : this(videoSource.SensorPath(), "/run/mxn-sensor.in.fifo", "/run/mxn-sensor.out.fifo")
+    constructor(videoSource: VideoSource) : this(videoSource.ScriptPath(), "/run/mxn-sensor.in.fifo", "/run/mxn-sensor.out.fifo")
 
     private fun script(command: String) = Shell.Send("$scriptPath $command")
 
-    var stream: FileWriter? = null
-    var isCancelled = false
+    private var stream: FileWriter? = null
+    private var isCancelled = false
     var gridSize = Pair(3, 3)
         get() = field
         set(p) {
@@ -40,7 +40,7 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
     }
 
     override fun Parse(text: String): Optional<Array<Int>> {
-        var parsedText = text.split(" "). drop(1). filter { it != "" }
+        val parsedText = text.split(" "). drop(1). filter { it != "" }
         val res = parsedText. map { Integer.parseInt(it) }. toTypedArray()
         return Optional.of(res)
     }
