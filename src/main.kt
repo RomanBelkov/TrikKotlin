@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
     println(video.Read()?.size())
     Thread.sleep(2000)
     val obs = video.ToObservable()
-    obs.Subscribe { println(it) }
+    obs.subscribe { println(it.get(1)) }
 
     /*    val fd = I2cNative.openBus("/dev/i2c-2", 0x48)
         println(I2cNative.readByte(fd, 0x23))

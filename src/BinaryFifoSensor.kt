@@ -1,6 +1,9 @@
+import rx.Subscriber
+import rx.subjects.PublishSubject
 import java.io.Closeable
 import java.io.FileInputStream
 import java.util.*
+import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
 
 /**
@@ -11,7 +14,7 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
 
     constructor(path: String, dataSize: Int, bufSize: Int) : this(path, dataSize, bufSize, -1)
 
-    private val notifier = Notifier<T>()
+    private val subject = PublishSubject.create<T>()
     private val bytes    = ByteArray(bufSize)
     private var isStarted = false
     private var isClosing = false
@@ -26,7 +29,7 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
             val blocks    = readCount / dataSize
             offset = 0
             for (i in 1..blocks) {
-                Parse(bytes, offset).ifPresent { notifier.onNext(it) }
+                Parse(bytes, offset).ifPresent { subject.onNext(it) }
                 offset += dataSize
             }
 
@@ -49,11 +52,28 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
 
     fun Read(): T? {
         if (isStarted == false) throw Exception("Calling Read() before Start() is prohibited")
-        return WaitForObservable(notifier.Publish())
+        val semaphore = Semaphore(0) //TODO to monitor
+        var result: T? = null
+
+        thread { subject.asObservable().subscribe(object : Subscriber<T>() {
+            override fun onNext(p0: T) {
+                result = p0
+                this.unsubscribe()
+                semaphore.release()
+            }
+
+            override fun onCompleted() = Unit
+
+            override fun onError(p0: Throwable) = throw p0
+
+        }) }
+
+        semaphore.acquire()
+        return result
     }
 
     fun Stop() {
-        notifier.onCompleted()
+        subject.onCompleted()
         isStarted = false
     }
 
