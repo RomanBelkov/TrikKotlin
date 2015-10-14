@@ -7,12 +7,12 @@ public enum class ServoPorts {
 
     fun Path(): String {
         when (this) {
-            S1 -> return "ehrpwm.1:1/"
-            S2 -> return "ehrpwm.1:0/"
-            S3 -> return "ehrpwm.0:1/"
-            S4 -> return "ecap.0/"
-            S5 -> return "ecap.1/"
-            S6 -> return "ecap.2/"
+            S1 -> return "ecap.2/"
+            S2 -> return "ecap.1/"
+            S3 -> return "ecap.0/"
+            S4 -> return "ehrpwm.0:1/"
+            S5 -> return "ehrpwm.1:0/"
+            S6 -> return "ehrpwm.1:1/"
         }
     }
 }
@@ -69,13 +69,6 @@ public enum class AnalogPorts {
 
 public enum class VideoSource {
     USB, VP1, VP2;
-
-    fun ScriptPath(): String {
-        when(this) {
-            USB  -> return "/etc/init.d/mxn-sensor-webcam.sh"
-            else -> return "/etc/init.d/mxn-sensor-ov7670.sh"
-        }
-    }
 }
 
 public enum class Ports {
