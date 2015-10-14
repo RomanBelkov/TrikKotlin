@@ -2,13 +2,15 @@
  * Created by Roman Belkov on 15.07.2015.
  */
 
+import rx.Subscriber
+import java.io.Closeable
 import java.io.File
 import kotlin.io.*
 
 
 public class ServoType(val min : Int, val max: Int, val zero: Int, val stop: Int, val period: Int)
 
-public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): java.io.Closeable {
+public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): Closeable, Subscriber<Int>() {
 
     private val pwmPath = "/sys/class/pwm/"
 
@@ -22,7 +24,7 @@ public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): java.i
 
     private fun writeDuty(duty: Int) = initWriter("duty_ns", duty.toString())
 
-    fun setPower(power: Int) {
+    fun SetPower(power: Int) {
         val squashedPower = Helpers.limit(-100, 100, power)
         val range: Int
         when {
@@ -34,13 +36,19 @@ public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): java.i
         writeDuty(duty)
     }
 
-    fun setZero() {
+    fun SetZero() {
         writeDuty(type.zero)
     }
 
     private fun Release() {
         writeDuty(type.stop)
     }
+
+    override fun onNext(p0: Int) = SetPower(p0)
+
+    override fun onError(p0: Throwable) = Release()
+
+    override fun onCompleted() = Release()
 
     override fun close() {
         Release()
