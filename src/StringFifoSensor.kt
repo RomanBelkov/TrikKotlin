@@ -21,12 +21,14 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
 
         tailrec fun reading (streamReader: BufferedReader) {
             val line = streamReader.readLine()
-            Parse(line).ifPresent { subject.onNext(it) }
+            if (line == null) Stop() else {
+                Parse(line).ifPresent { subject.onNext(it) }
 
-            reading(streamReader)
+                reading(streamReader)
+            }
         }
 
-        val threadHandler = thread { if (isClosing == false) reading(streamReader) }
+        val threadHandler = thread { while(!isClosing) reading(streamReader); streamReader.close() }
 
         return threadHandler
     }
@@ -62,6 +64,7 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
     }
 
     open fun Stop() {
+        isClosing = true
         subject.onCompleted()
         isStarted = false
     }

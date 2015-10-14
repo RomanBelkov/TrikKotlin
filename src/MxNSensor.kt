@@ -12,7 +12,12 @@ import java.util.*
  */
 class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: String): StringFifoSensor<Array<Int>>(sensorPath), Closeable, AutoCloseable {
 
-    constructor(videoSource: VideoSource) : this(videoSource.ScriptPath(), "/run/mxn-sensor.in.fifo", "/run/mxn-sensor.out.fifo")
+    constructor(videoSource: VideoSource) : this(
+        when(videoSource) {
+            VideoSource.USB  -> "/etc/init.d/mxn-sensor-webcam.sh"
+            else             -> "/etc/init.d/mxn-sensor-ov7670.sh"
+        },
+        "/run/mxn-sensor.in.fifo", "/run/mxn-sensor.out.fifo")
 
     private fun script(command: String) = Shell.Send("$scriptPath $command")
 
@@ -49,7 +54,5 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
         isCancelled = true
         Stop()
         stream?.close()
-        //super.close()
-
     }
 }

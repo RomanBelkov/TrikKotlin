@@ -12,11 +12,16 @@ open class VideoSensorOutput private constructor() {
 
     class ObjectLocation(val x: Int, val y: Int, val mass: Int) : VideoSensorOutput() {
         constructor(x: String, y: String, mass: String) : this(parseInt(x), parseInt(y), parseInt(mass))
+
+        override fun toString() = "loc $x $y $mass"
+
     }
 
     class DetectTarget(val hue: Int, val hueTolerance: Int, val saturation: Int, val saturationTolerance: Int, val value: Int, val valueTolerance: Int) : VideoSensorOutput() {
         constructor(hue: String, hueTolerance: String, saturation: String, saturationTolerance: String, value: String, valueTolerance: String) :
         this(parseInt(hue), parseInt(hueTolerance), parseInt(saturation), parseInt(saturationTolerance), parseInt(value), parseInt(valueTolerance))
+
+        override fun toString() = "hsv $hue $hueTolerance $saturation $saturationTolerance $value $valueTolerance\n"
     }
 
     fun TryGetTarget(): Optional<DetectTarget> =
@@ -32,6 +37,16 @@ open class VideoSensorOutput private constructor() {
             is ObjectLocation -> Optional.of(this)
             else              -> throw Exception("Should never occur")
         }
+
+    fun GetTarget(): DetectTarget {
+        val value = TryGetTarget()
+        if (value.isPresent) return value.get() else throw Exception("SensorOutput is not a Target")
+    }
+
+    fun GetLocation(): ObjectLocation {
+        val value = TryGetLocation()
+        if (value.isPresent) return value.get() else throw Exception("SensorOutput is not a Location")
+    }
 
 }
 
