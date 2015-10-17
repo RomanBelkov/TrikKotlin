@@ -1,5 +1,4 @@
 import java.io.FileWriter
-import java.util.*
 
 /**
  * Created by Roman Belkov on 10.10.15.
@@ -24,29 +23,19 @@ open class VideoSensorOutput private constructor() {
         override fun toString() = "hsv $hue $hueTolerance $saturation $saturationTolerance $value $valueTolerance\n"
     }
 
-    fun TryGetTarget(): Optional<DetectTarget> =
+    fun TryGetTarget(): DetectTarget? =
         when(this) {
-            is ObjectLocation -> Optional.empty<DetectTarget>()
-            is DetectTarget   -> Optional.of(this)
+            is ObjectLocation -> null
+            is DetectTarget   -> this
             else              -> throw Exception("Should never occur")
         }
 
-    fun TryGetLocation(): Optional<ObjectLocation> =
+    fun TryGetLocation(): ObjectLocation? =
         when(this) {
-            is DetectTarget   -> Optional.empty<ObjectLocation>()
-            is ObjectLocation -> Optional.of(this)
+            is DetectTarget   -> null
+            is ObjectLocation -> this
             else              -> throw Exception("Should never occur")
         }
-
-    fun GetTarget(): DetectTarget {
-        val value = TryGetTarget()
-        if (value.isPresent) return value.get() else throw Exception("SensorOutput is not a Target")
-    }
-
-    fun GetLocation(): ObjectLocation {
-        val value = TryGetLocation()
-        if (value.isPresent) return value.get() else throw Exception("SensorOutput is not a Location")
-    }
 
 }
 
@@ -73,7 +62,7 @@ abstract class VideoSensor<T>(val scriptPath: String, val commandPath: String, s
 
     fun Detect() {
         if (stream == null) throw Exception("Missing Start() call before calling Detect()")
-        stream?.write("detect")
+        stream?.write("detect\n")
         stream?.flush()
     }
 

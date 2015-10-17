@@ -9,8 +9,6 @@ import java.util.*
 data class Point(val x: Int, val y: Int,val z: Int)
 
 
-private fun intFromTwoBytes(firstByte: Byte, secondByte: Byte): Int = JavaHelpers.GetIntFromTwoBytes(firstByte, secondByte)
-
 open class Sensor3D(val min: Int, val max: Int, devicePath: String): BinaryFifoSensor<Point>(devicePath, 16, 1024) {
     private val evAbs = 3
     private val lastArray = Array(3, {0})

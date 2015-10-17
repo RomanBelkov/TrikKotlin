@@ -18,6 +18,8 @@ object Shell {
     }
 }
 
+internal fun intFromTwoBytes(firstByte: Byte, secondByte: Byte): Int = JavaHelpers.GetIntFromTwoBytes(firstByte, secondByte)
+
 public object Helpers {
 
     public fun TakeScreenshot(name: String) = Shell.Send("fbgrab -S -z 0 $name 2> /dev/null")

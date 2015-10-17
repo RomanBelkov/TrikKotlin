@@ -43,7 +43,6 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
 
     abstract fun Parse(bytes: ByteArray, offset: Int): Optional<T>
 
-
     open fun Start() {
         if (isStarted == true) throw Exception("Calling Start() second time is prohibited")
         loop()
@@ -76,6 +75,8 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
         subject.onCompleted()
         isStarted = false
     }
+
+    fun ToObservable() = subject.asObservable()
 
     override fun close() {
         isClosing = true
