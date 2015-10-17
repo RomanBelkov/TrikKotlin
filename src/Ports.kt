@@ -71,6 +71,20 @@ public enum class VideoSource {
     USB, VP1, VP2;
 }
 
-public enum class Ports {
+public enum class ButtonEventCode(val code: Int) {
+    Sync(0), Escape(1), Enter(28), Power(116), Up(103), Left(105), Right(106), Down(108);
 
+    fun GetCode() =
+        when (this) {
+            Sync   -> 0
+            Escape -> 1
+            Enter  -> 28
+            Power  -> 116
+            Up     -> 103
+            Left   -> 105
+            Right  -> 106
+            Down   -> 108
+        }
+
+    override fun toString(): String = GetCode().toString()
 }
