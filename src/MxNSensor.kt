@@ -15,7 +15,7 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
     constructor(videoSource: VideoSource) : this(
         when(videoSource) {
             VideoSource.USB  -> "/etc/init.d/mxn-sensor-webcam.sh"
-            else             -> "/etc/init.d/mxn-sensor-ov7670.sh"
+            else             -> "/etc/init.d/mxn-sensor-ov7670"
         },
         "/run/mxn-sensor.in.fifo", "/run/mxn-sensor.out.fifo")
 

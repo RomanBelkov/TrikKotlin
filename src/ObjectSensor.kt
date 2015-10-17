@@ -9,7 +9,7 @@ class ObjectSensor(scriptPath: String, commandPath: String, sensorPath: String) 
     constructor(videoSource: VideoSource) : this(
         when(videoSource) {
             VideoSource.USB  -> "/etc/init.d/object-sensor-webcam.sh"
-            else             -> "/etc/init.d/object-sensor-ov7670.sh"
+            else             -> "/etc/init.d/object-sensor-ov7670"
         },
         "/run/object-sensor.in.fifo", "/run/object-sensor.out.fifo")
 
