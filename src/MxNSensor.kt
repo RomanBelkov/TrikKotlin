@@ -1,10 +1,5 @@
-import sun.nio.cs.US_ASCII
-import java.io.BufferedOutputStream
 import java.io.Closeable
-import java.io.FileOutputStream
 import java.io.FileWriter
-import java.nio.channels.FileChannel
-import java.nio.charset.Charset
 import java.util.*
 
 /**

@@ -4,7 +4,7 @@ import java.util.*
  * Created by Roman Belkov on 10.10.15.
  */
 
-class ObjectSensor(scriptPath: String, commandPath: String, sensorPath: String) : VideoSensor<VideoSensorOutput>(scriptPath, commandPath, sensorPath) {
+class ObjectSensor(scriptPath: String, commandPath: String, sensorPath: String) : VideoSensor(scriptPath, commandPath, sensorPath) {
 
     constructor(videoSource: VideoSource) : this(
         when(videoSource) {
