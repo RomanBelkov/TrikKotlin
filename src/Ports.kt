@@ -20,7 +20,7 @@ public enum class ServoPorts {
 public enum class MotorPorts {
     M1, M2, M3, M4;
 
-    fun I2cPwmAddress(): Byte {
+    fun I2cPwmAddress(): Int {
         when (this) {
             M1 -> return 0x10
             M2 -> return 0x11
@@ -29,7 +29,7 @@ public enum class MotorPorts {
         }
     }
 
-    fun I2cPowerAddress(): Byte {
+    fun I2cPowerAddress(): Int {
         when (this) {
             M1 -> return 0x14
             M2 -> return 0x15
@@ -42,7 +42,7 @@ public enum class MotorPorts {
 public enum class EncoderPorts {
     E1, E2, E3, E4;
 
-    fun I2cAddress(): Byte {
+    fun I2cAddress(): Int {
         when (this) {
             E1 -> return 0x30
             E2 -> return 0x31
@@ -55,7 +55,7 @@ public enum class EncoderPorts {
 public enum class AnalogPorts {
     A1, A2, A3, A4, A5, A6;
 
-    fun I2cAddress(): Byte {
+    fun I2cAddress(): Int {
         when (this) {
             A1 -> return 0x25
             A2 -> return 0x24

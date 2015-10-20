@@ -7,11 +7,11 @@ public interface I2c {
 
     fun Close()
 
-    fun Write(address: Byte, byte: Byte)
+    fun WriteByte(address: Int, byte: Int)
 
-    fun Write(address: Byte, value: Short)
+    fun WriteWord(address: Int, word: Int)
 
-    fun ReadWord(address: Byte): Int
+    fun ReadWord(address: Int): Int
 
-    fun ReadAllBytes(address: Byte): Int
+    fun ReadAllBytes(address: Int): Long
 }
