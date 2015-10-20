@@ -5,8 +5,6 @@ import java.io.FileWriter
  */
 
 
-private fun parseInt(s: String) = Integer.parseInt(s)
-
 open class VideoSensorOutput private constructor() {
 
     class ObjectLocation(val x: Int, val y: Int, val mass: Int) : VideoSensorOutput() {
@@ -39,7 +37,7 @@ open class VideoSensorOutput private constructor() {
 
 }
 
-abstract class VideoSensor<T>(val scriptPath: String, val commandPath: String, sensorPath: String) : StringFifoSensor<VideoSensorOutput>(sensorPath) {
+abstract class VideoSensor(val scriptPath: String, val commandPath: String, sensorPath: String) : StringFifoSensor<VideoSensorOutput>(sensorPath) {
 
     private fun script(command: String) = Shell.Send("$scriptPath $command")
 
