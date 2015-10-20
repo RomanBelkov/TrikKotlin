@@ -13,7 +13,7 @@ class ObjectSensor(scriptPath: String, commandPath: String, sensorPath: String) 
         },
         "/run/object-sensor.in.fifo", "/run/object-sensor.out.fifo")
 
-    override fun Parse(text: String): Optional<VideoSensorOutput> {
+    override fun parse(text: String): Optional<VideoSensorOutput> {
         val parsedText = text.split(" "). filter { it != "" }
         when {
             parsedText[0] == "loc:" && parsedText.size() == 4 ->

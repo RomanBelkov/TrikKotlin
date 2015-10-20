@@ -14,7 +14,7 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
         },
         "/run/mxn-sensor.in.fifo", "/run/mxn-sensor.out.fifo")
 
-    private fun script(command: String) = Shell.Send("$scriptPath $command")
+    private fun script(command: String) = Shell.send("$scriptPath $command")
 
     private var stream: FileWriter? = null
     private var isCancelled = false
@@ -27,19 +27,19 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
             field = p
         }
 
-    override fun Start() {
+    override fun start() {
         stream = FileWriter(commandPath, true)
         script("start")
-        super.Start()
+        super.start()
     }
 
-    override fun Stop() {   //revise .NET code of this method (forgetting to close stream?)
-        super.Stop()
+    override fun stop() {   //revise .NET code of this method (forgetting to close stream?)
+        super.stop()
         stream?.close()
         script("stop")
     }
 
-    override fun Parse(text: String): Optional<Array<Int>> {
+    override fun parse(text: String): Optional<Array<Int>> {
         val parsedText = text.split(" "). drop(1). filter { it != "" }
         val res = parsedText. map { Integer.parseInt(it) }. toTypedArray()
         return Optional.of(res)
@@ -47,7 +47,7 @@ class MxNSensor(val scriptPath: String,val commandPath: String, sensorPath: Stri
 
     override fun close() {
         isCancelled = true
-        Stop()
+        stop()
         stream?.close()
     }
 }

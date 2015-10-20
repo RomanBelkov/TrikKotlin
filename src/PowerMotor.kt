@@ -6,7 +6,7 @@ public class PowerMotor(val I2cPowerAddress: Int) {
 
     constructor(motorPort: MotorPorts) : this(motorPort.I2cPowerAddress())
 
-    fun SetPower(power: Int) = I2cTrik.WriteByte(I2cPowerAddress, Helpers.limit(-100, 100, power)) //todo maybe a power: byte would be better?
+    fun setPower(power: Int) = I2cTrik.writeByte(I2cPowerAddress, Helpers.limit(-100, 100, power))
 
-    fun Stop() = SetPower(0)
+    fun stop() = setPower(0)
 }

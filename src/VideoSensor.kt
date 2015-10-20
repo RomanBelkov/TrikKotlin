@@ -21,14 +21,14 @@ open class VideoSensorOutput private constructor() {
         override fun toString() = "hsv $hue $hueTolerance $saturation $saturationTolerance $value $valueTolerance\n"
     }
 
-    fun TryGetTarget(): DetectTarget? =
+    fun tryGetTarget(): DetectTarget? =
         when(this) {
             is ObjectLocation -> null
             is DetectTarget   -> this
             else              -> throw Exception("Should never occur")
         }
 
-    fun TryGetLocation(): ObjectLocation? =
+    fun tryGetLocation(): ObjectLocation? =
         when(this) {
             is DetectTarget   -> null
             is ObjectLocation -> this
@@ -39,7 +39,7 @@ open class VideoSensorOutput private constructor() {
 
 abstract class VideoSensor(val scriptPath: String, val commandPath: String, sensorPath: String) : StringFifoSensor<VideoSensorOutput>(sensorPath) {
 
-    private fun script(command: String) = Shell.Send("$scriptPath $command")
+    private fun script(command: String) = Shell.send("$scriptPath $command")
 
     private var stream: FileWriter? = null
     private var isCancelled = false
@@ -52,27 +52,27 @@ abstract class VideoSensor(val scriptPath: String, val commandPath: String, sens
             else           -> { stream?.write("video_out ${if (p == true) 1 else 0}"); stream?.flush(); field = p }
         }
 
-    override fun Start() {
+    override fun start() {
         script("start")
-        super.Start()
+        super.start()
         stream = FileWriter(commandPath)
     }
 
-    fun Detect() {
+    fun detect() {
         if (stream == null) throw Exception("Missing Start() call before calling Detect()")
         stream?.write("detect\n")
         stream?.flush()
     }
 
-    fun SetDetectTarget(target: VideoSensorOutput.DetectTarget) {
+    fun setDetectTarget(target: VideoSensorOutput.DetectTarget) {
         if (stream == null) throw Exception("Missing Start() call before calling SetDetectTarget()")
         stream?.write(target.toString())
         stream?.flush()
     }
 
-    override fun Stop() {
+    override fun stop() {
         stream?.close()
-        super.Stop()
+        super.stop()
         script ("stop")
     }
 }

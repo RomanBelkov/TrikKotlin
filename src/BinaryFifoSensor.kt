@@ -29,7 +29,7 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
             val blocks    = readCount / dataSize
             offset = 0
             for (i in 1..blocks) {
-                Parse(bytes, offset).ifPresent { subject.onNext(it) }
+                parse(bytes, offset).ifPresent { subject.onNext(it) }
                 offset += dataSize
             }
 
@@ -41,15 +41,15 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
         return threadHandler
     }
 
-    abstract fun Parse(bytes: ByteArray, offset: Int): Optional<T>
+    abstract fun parse(bytes: ByteArray, offset: Int): Optional<T>
 
-    open fun Start() {
+    open fun start() {
         if (isStarted == true) throw Exception("Calling Start() second time is prohibited")
         loop()
         isStarted = true
     }
 
-    fun Read(): T? {
+    fun read(): T? {
         if (isStarted == false) throw Exception("Calling Read() before Start() is prohibited")
         val semaphore = Semaphore(0) //TODO to monitor
         var result: T? = null
@@ -71,15 +71,15 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
         return result
     }
 
-    fun Stop() {
+    fun stop() {
         subject.onCompleted()
         isStarted = false
     }
 
-    fun ToObservable() = subject.asObservable()
+    fun toObservable() = subject.asObservable()
 
     override fun close() {
         isClosing = true
-        Stop()
+        stop()
     }
 }

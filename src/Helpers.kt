@@ -5,22 +5,22 @@ import kotlin.concurrent.thread
  */
 
 object Shell {
-    fun Send(command: String): Int {
+    fun send(command: String): Int {
         val p = Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", command))
         p.waitFor()
         return p.exitValue()
     }
 
-    fun Post(command: String): Int {
+    fun post(command: String): Int {
         var res: Int = 0
-        thread { res = Send(command) }
+        thread { res = send(command) }
         return res
     }
 }
 
 public object Helpers {
 
-    public fun TakeScreenshot(name: String) = Shell.Send("fbgrab -S -z 0 $name 2> /dev/null")
+    public fun takeScreenshot(name: String) = Shell.send("fbgrab -S -z 0 $name 2> /dev/null")
 
     public fun limit<T: Comparable<T>>(minValue: T, maxValue: T, value: T): T {
         when {

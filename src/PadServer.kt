@@ -19,7 +19,7 @@ open class GamepadEvent private constructor() {
 class GamepadServer(val port: Int = 4545) {
     private val subject = PublishSubject.create<GamepadEvent>()
     private var isCancelled = false
-    private var threadHandle: Thread? = null
+    //private var threadHandle: Thread? = null
 
     fun parseRequest(request: String) {
         val parsedRequest = request.split(" "). filter { it != "" }
@@ -55,16 +55,16 @@ class GamepadServer(val port: Int = 4545) {
         val clientSocket = serverSocket.accept()
         val inReader     = BufferedReader(InputStreamReader(clientSocket.inputStream))
 
-        threadHandle = thread { clientLoop(inReader) }
+        thread { clientLoop(inReader) }
 
     }
 
-    fun Start() = startServer()
+    fun start() = startServer()
 
-    fun Stop() {
+    fun stop() {
         isCancelled = true
     }
 
-    fun ToObservable() = subject.asObservable()
+    fun toObservable() = subject.asObservable()
 }
 

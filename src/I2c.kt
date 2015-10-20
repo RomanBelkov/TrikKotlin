@@ -3,15 +3,15 @@
  */
 
 public interface I2c {
-    fun Open()
+    fun open()
 
-    fun Close()
+    fun close()
 
-    fun WriteByte(address: Int, byte: Int)
+    fun writeByte(address: Int, byte: Int)
 
-    fun WriteWord(address: Int, word: Int)
+    fun writeWord(address: Int, word: Int)
 
-    fun ReadWord(address: Int): Int
+    fun readWord(address: Int): Int
 
-    fun ReadAllBytes(address: Int): Long
+    fun readAllBytes(address: Int): Long
 }

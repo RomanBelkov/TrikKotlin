@@ -21,8 +21,8 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
 
         tailrec fun reading (streamReader: BufferedReader) {
             val line = streamReader.readLine()
-            if (line == null) Stop() else {
-                Parse(line).ifPresent { subject.onNext(it) }
+            if (line == null) stop() else {
+                parse(line).ifPresent { subject.onNext(it) }
 
                 reading(streamReader)
             }
@@ -33,15 +33,15 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
         return threadHandler
     }
 
-    abstract fun Parse(text: String): Optional<T>
+    abstract fun parse(text: String): Optional<T>
 
-    open fun Start() {
+    open fun start() {
         if (isStarted == true) throw Exception("Calling Start() second time is prohibited")
         loop()
         isStarted = true
     }
 
-    fun Read(): T? {
+    fun read(): T? {
         if (isStarted == false) throw Exception("Calling Read() before Start() is prohibited")
         val semaphore = Semaphore(0) //TODO to monitor
         var result: T? = null
@@ -63,17 +63,17 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
         return result
     }
 
-    open fun Stop() {
+    open fun stop() {
         isClosing = true
         subject.onCompleted()
         isStarted = false
     }
 
-    fun ToObservable() = subject.asObservable()
+    fun toObservable() = subject.asObservable()
 
     override fun close() {
         isClosing = true
-        Stop()
+        stop()
     }
 
 }

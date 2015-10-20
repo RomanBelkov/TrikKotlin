@@ -24,7 +24,7 @@ public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): Closea
 
     private fun writeDuty(duty: Int) = initWriter("duty_ns", duty.toString())
 
-    fun SetPower(power: Int) {
+    fun setPower(power: Int) {
         val squashedPower = Helpers.limit(-100, 100, power)
         val range: Int
         when {
@@ -36,22 +36,22 @@ public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): Closea
         writeDuty(duty)
     }
 
-    fun SetZero() {
+    fun setZero() {
         writeDuty(type.zero)
     }
 
-    private fun Release() {
+    private fun release() {
         writeDuty(type.stop)
     }
 
-    override fun onNext(p0: Int) = SetPower(p0)
+    override fun onNext(p0: Int) = setPower(p0)
 
-    override fun onError(p0: Throwable) = Release()
+    override fun onError(p0: Throwable) = release()
 
-    override fun onCompleted() = Release()
+    override fun onCompleted() = release()
 
     override fun close() {
-        Release()
+        release()
         initWriter("request", "0")
     }
 }

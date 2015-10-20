@@ -7,9 +7,9 @@ import java.util.concurrent.TimeUnit
 
 abstract class PollingSensor {
     val defaultRate: Long = 50
-    abstract fun Read() : Number
+    abstract fun read() : Number
 
-    fun ToObservable(pollingRate: Long, unit: TimeUnit) = Observable.interval(pollingRate, unit).map { Read() }
+    fun toObservable(pollingRate: Long, unit: TimeUnit) = Observable.interval(pollingRate, unit).map { read() }
 
-    fun ToObservable() = ToObservable(defaultRate, TimeUnit.MILLISECONDS)
+    fun toObservable() = toObservable(defaultRate, TimeUnit.MILLISECONDS)
 }
