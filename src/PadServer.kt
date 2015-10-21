@@ -9,10 +9,18 @@ import kotlin.concurrent.thread
  */
 
 open class GamepadEvent private constructor() {
-    class Pad(val padId: Int, val coords: Pair<Int, Int>) : GamepadEvent()
-    class PadUp(val padId: Int) : GamepadEvent()
-    class Button(val buttonId: Int) : GamepadEvent()
-    class Wheel(val rollValue: Int) : GamepadEvent()
+    class Pad(val padId: Int, val coords: Pair<Int, Int>) : GamepadEvent() {
+        override fun toString() = "pad $padId ${coords.first} ${coords.second}"
+    }
+    class PadUp(val padId: Int) : GamepadEvent() {
+        override fun toString() = "pad $padId up"
+    }
+    class Button(val buttonId: Int) : GamepadEvent() {
+        override fun toString() = "btn $buttonId down"
+    }
+    class Wheel(val rollValue: Int) : GamepadEvent() {
+        override fun toString() = "wheel $rollValue"
+    }
     class Stop : GamepadEvent()
 }
 
