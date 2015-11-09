@@ -36,7 +36,7 @@ class Buttons(deviceFilePath: String) : BinaryFifoSensor<ButtonEvent>(deviceFile
     var clicksOnly = true
 
     override fun parse(bytes: ByteArray, offset: Int): Optional<ButtonEvent> {
-        if (bytes.size() < 16) return Optional.empty()
+        if (bytes.size < 16) return Optional.empty()
 
         val evType  = intFromTwoBytes(bytes[offset + 9], bytes[offset + 8])
         //println("evType:  $evType ")

@@ -14,7 +14,7 @@ open class Sensor3D(val min: Int, val max: Int, devicePath: String): BinaryFifoS
     private val lastArray = Array(3, {0})
 
     override fun parse(bytes: ByteArray, offset: Int): Optional<Point> {
-        if (bytes.size() < 16) return Optional.empty()
+        if (bytes.size < 16) return Optional.empty()
 
         val evType  = intFromTwoBytes(bytes[offset + 9], bytes[offset + 8])
         //println("evType:  $evType ")

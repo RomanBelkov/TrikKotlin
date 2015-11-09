@@ -22,7 +22,7 @@ public object Helpers {
 
     public fun takeScreenshot(name: String) = Shell.send("fbgrab -S -z 0 $name 2> /dev/null")
 
-    public fun limit<T: Comparable<T>>(minValue: T, maxValue: T, value: T): T {
+    public fun <T: Comparable<T>> limit(minValue: T, maxValue: T, value: T): T {
         when {
             value > maxValue -> return maxValue
             value < minValue -> return minValue

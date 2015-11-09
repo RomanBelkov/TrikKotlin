@@ -33,17 +33,17 @@ class GamepadServer(val port: Int = 4545) {
         val parsedRequest = request.split(" "). filter { it != "" }
 
         when {
-            parsedRequest[0] == "pad" && parsedRequest.size() == 4
+            parsedRequest[0] == "pad" && parsedRequest.size == 4
             -> subject.onNext(GamepadEvent.Pad(parseInt(parsedRequest[1]),
                     Pair(parseInt(parsedRequest[2]), parseInt(parsedRequest[3]))))
 
-            parsedRequest[0] == "wheel" && parsedRequest.size() == 2
+            parsedRequest[0] == "wheel" && parsedRequest.size == 2
                 -> subject.onNext(GamepadEvent.Wheel(parseInt(parsedRequest[1])))
 
-            parsedRequest[0] == "pad" && parsedRequest[2] == "up" && parsedRequest.size() == 3
+            parsedRequest[0] == "pad" && parsedRequest[2] == "up" && parsedRequest.size == 3
                 -> subject.onNext(GamepadEvent.PadUp(parseInt(parsedRequest[1])))
 
-            parsedRequest[0] == "btn" && parsedRequest[2] == "down" && parsedRequest.size() == 3
+            parsedRequest[0] == "btn" && parsedRequest[2] == "down" && parsedRequest.size == 3
                 -> subject.onNext(GamepadEvent.Button(parseInt(parsedRequest[1])))
 
             else -> throw Exception("Gamepad server failed to parse request")

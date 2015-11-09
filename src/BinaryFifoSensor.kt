@@ -25,7 +25,7 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
 
         tailrec fun reading (inputStream: FileInputStream) {
 
-            val readCount = inputStream.read(bytes, 0, bytes.size())
+            val readCount = inputStream.read(bytes, 0, bytes.size)
             val blocks    = readCount / dataSize
             offset = 0
             for (i in 1..blocks) {
