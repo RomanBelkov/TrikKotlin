@@ -3,7 +3,7 @@ import rx.subjects.PublishSubject
 import java.io.Closeable
 import java.io.FileInputStream
 import java.util.*
-import java.util.concurrent.Semaphore
+import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
 /**
@@ -14,16 +14,18 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
 
     constructor(path: String, dataSize: Int, bufSize: Int) : this(path, dataSize, bufSize, -1)
 
-    private val subject = PublishSubject.create<T>()
-    private val bytes    = ByteArray(bufSize)
+    private var subject   = PublishSubject.create<T>()
+    private val bytes     = ByteArray(bufSize)
     private var isStarted = false
     private var isClosing = false
-    private var offset = 0
+    private var offset    = 0
+    private var threadHandler : Thread? = null
 
-    private fun loop(): Thread {
+    private fun loop() {
         val inputStream = FileInputStream(path)
 
         tailrec fun reading (inputStream: FileInputStream) {
+            if (isClosing == true) {inputStream.close(); return}
 
             val readCount = inputStream.read(bytes, 0, bytes.size)
             val blocks    = readCount / dataSize
@@ -32,54 +34,63 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
                 parse(bytes, offset).ifPresent { subject.onNext(it) }
                 offset += dataSize
             }
-
             reading(inputStream)
         }
 
-        val threadHandler = thread { if (isClosing == false) reading(inputStream) }
-
-        return threadHandler
+        threadHandler = thread { reading(inputStream) }
     }
 
     abstract fun parse(bytes: ByteArray, offset: Int): Optional<T>
 
     open fun start() {
-        if (isStarted == true) throw Exception("Calling Start() second time is prohibited")
+        if (isStarted == true) throw Exception("Calling start() second time is prohibited")
         loop()
         isStarted = true
     }
 
     fun read(): T? {
-        if (isStarted == false) throw Exception("Calling Read() before Start() is prohibited")
-        val semaphore = Semaphore(0) //TODO to monitor
+        if (isStarted == false) {
+            println("TrikKotlin: Starting the sensor for you!")
+            start()
+        }
+
+        val countdown = CountDownLatch(1)
         var result: T? = null
+        thread {
+            subject.asObservable().subscribe(object : Subscriber<T>() {
+                override fun onNext(p0: T) {
+                    result = p0
+                    this.unsubscribe()
+                    countdown.countDown()
+                }
 
-        thread { subject.asObservable().subscribe(object : Subscriber<T>() {
-            override fun onNext(p0: T) {
-                result = p0
-                this.unsubscribe()
-                semaphore.release()
-            }
+                override fun onCompleted() = Unit
 
-            override fun onCompleted() = Unit
+                override fun onError(p0: Throwable) = throw p0
 
-            override fun onError(p0: Throwable) = throw p0
+            })
+        }
 
-        }) }
-
-        semaphore.acquire()
+        countdown.await()
         return result
     }
 
     fun stop() {
-        subject.onCompleted()
-        isStarted = false
+        if (isStarted == false) throw Exception("Calling stop() before start() is prohibited")
+        close()
+        subject = PublishSubject.create<T>()
     }
 
     fun toObservable() = subject.asObservable()
 
     override fun close() {
-        isClosing = true
-        stop()
+        if (isStarted == true) {
+            isClosing = true
+            while (threadHandler!!.isAlive) {
+            }
+            subject.onCompleted()
+            isStarted = false
+            isClosing = false
+        }
     }
 }
