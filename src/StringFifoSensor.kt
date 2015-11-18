@@ -6,20 +6,24 @@ import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
 import rx.Subscriber
 import rx.subjects.PublishSubject
+import java.util.concurrent.CountDownLatch
 
 /**
  * Created by Roman Belkov on 28.09.15.
  */
 
 abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
-    private val subject = PublishSubject.create<T>()
+    private var subject = PublishSubject.create<T>()
     private var isStarted = false
     private var isClosing = false
+    private var threadHandler : Thread? = null
 
-    private fun loop(): Thread {
+    private fun loop() {
         val streamReader = BufferedReader(FileReader(path))
 
         tailrec fun reading (streamReader: BufferedReader) {
+            if (isClosing == true) {streamReader.close(); return}
+
             val line = streamReader.readLine()
             if (line == null) stop() else {
                 parse(line).ifPresent { subject.onNext(it) }
@@ -28,29 +32,31 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
             }
         }
 
-        val threadHandler = thread { while(!isClosing) reading(streamReader); streamReader.close() }
-
-        return threadHandler
+        threadHandler = thread { reading(streamReader) }
     }
 
     abstract fun parse(text: String): Optional<T>
 
     open fun start() {
-        if (isStarted == true) throw Exception("Calling Start() second time is prohibited")
+        if (isStarted == true) throw Exception("Calling start() second time is prohibited")
         loop()
         isStarted = true
     }
 
     fun read(): T? {
-        if (isStarted == false) throw Exception("Calling Read() before Start() is prohibited")
-        val semaphore = Semaphore(0) //TODO to monitor
+        if (isStarted == false) {
+            println("TrikKotlin: Starting the sensor for you!")
+            start()
+        }
+
+        val countdown = CountDownLatch(1)
         var result: T? = null
 
         thread { subject.asObservable().subscribe(object : Subscriber<T>() {
             override fun onNext(p0: T) {
                 result = p0
                 this.unsubscribe()
-                semaphore.release()
+                countdown.countDown()
             }
 
             override fun onCompleted() = Unit
@@ -59,21 +65,26 @@ abstract class StringFifoSensor<T>(val path: String): Closeable, AutoCloseable {
 
         }) }
 
-        semaphore.acquire()
+        countdown.await()
         return result
     }
 
     open fun stop() {
-        isClosing = true
-        subject.onCompleted()
-        isStarted = false
+        if (isStarted == false) throw Exception("Calling stop() before start() is prohibited")
+        close()
+        subject = PublishSubject.create<T>()
     }
 
     fun toObservable() = subject.asObservable()
 
     override fun close() {
-        isClosing = true
-        stop()
+        if (isStarted == true) {
+            isClosing = true
+            while (threadHandler!!.isAlive) {
+            }
+            subject.onCompleted()
+            isStarted = false
+            isClosing = false
+        }
     }
-
 }
