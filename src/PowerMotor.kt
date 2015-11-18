@@ -4,7 +4,7 @@
 
 public class PowerMotor(val I2cPowerAddress: Int) {
 
-    constructor(motorPort: MotorPorts) : this(motorPort.I2cPowerAddress())
+    constructor(motorPort: MotorPorts) : this(motorPort.powerAddress)
 
     fun setPower(power: Int) = I2cTrik.writeByte(I2cPowerAddress, Helpers.limit(-100, 100, power))
 

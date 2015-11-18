@@ -3,7 +3,7 @@
 */
 public class Encoder(val I2cAddress : Int) : PollingSensor() {
 
-    constructor(encoderPort: EncoderPorts) : this(encoderPort.I2cAddress())
+    constructor(encoderPort: EncoderPorts) : this(encoderPort.address)
 
     override fun read(): Long = I2cTrik.readAllBytes(I2cAddress)
 

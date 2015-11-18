@@ -4,7 +4,7 @@
 
 public class AnalogSensor(val I2cAddress : Int) : PollingSensor() {
 
-    constructor(analogPort: AnalogPorts) : this(analogPort.I2cAddress())
+    constructor(analogPort: AnalogPorts) : this(analogPort.address)
 
     override fun read(): Int {
         return  I2cTrik.readWord(I2cAddress)

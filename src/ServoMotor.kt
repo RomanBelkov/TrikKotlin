@@ -14,7 +14,7 @@ public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): Closea
 
     private val pwmPath = "/sys/class/pwm/"
 
-    private fun initWriter(targetPath: String, value: String) = File(pwmPath + servoPath.Path() + targetPath).writeText(value)
+    private fun initWriter(targetPath: String, value: String) = File(pwmPath + servoPath.path + targetPath).writeText(value)
     init {
         initWriter("request", "0")
         initWriter("request", "1")
