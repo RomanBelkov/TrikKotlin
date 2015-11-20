@@ -18,8 +18,8 @@ open class GamepadEvent private constructor() {
     class Button(val buttonId: Int) : GamepadEvent() {
         override fun toString() = "btn $buttonId down"
     }
-    class Wheel(val rollValue: Int) : GamepadEvent() {
-        override fun toString() = "wheel $rollValue"
+    class Wheel(val roll: Int) : GamepadEvent() {
+        override fun toString() = "wheel $roll"
     }
     class Stop : GamepadEvent()
 }
@@ -69,7 +69,7 @@ class GamepadServer(val port: Int = 4545) {
 
     fun start() = startServer()
 
-    fun stop() {
+    fun stop() { //TODO stop & close should work OK!
         isCancelled = true
     }
 

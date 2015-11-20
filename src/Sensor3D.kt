@@ -6,8 +6,7 @@ import java.util.*
  * Created by Roman Belkov on 06.10.15.
  */
 
-data class Point(val x: Int, val y: Int,val z: Int)
-
+data class Point(val x: Int, val y: Int, val z: Int)
 
 open class Sensor3D(val min: Int, val max: Int, devicePath: String): BinaryFifoSensor<Point>(devicePath, 16, 1024) {
     private val evAbs = 3

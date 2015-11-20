@@ -7,14 +7,22 @@ import java.io.Closeable
 import java.io.File
 import kotlin.io.*
 
-
+/**
+ * Class that represents specific servo motor type
+ */
 public class ServoType(val min : Int, val max: Int, val zero: Int, val stop: Int, val period: Int)
 
-public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): Closeable, Subscriber<Int>() {
+/**
+ * Class that represents servo motor
+ *
+ * @param servoPort port that servo is connected to
+ * @param type type of servo
+ */
+public class ServoMotor(val servoPort: ServoPorts, val type : ServoType): Closeable, Subscriber<Int>() { //TODO second constructor
 
     private val pwmPath = "/sys/class/pwm/"
 
-    private fun initWriter(targetPath: String, value: String) = File(pwmPath + servoPath.path + targetPath).writeText(value)
+    private fun initWriter(targetPath: String, value: String) = File(pwmPath + servoPort.path + targetPath).writeText(value)
     init {
         initWriter("request", "0")
         initWriter("request", "1")
@@ -24,6 +32,11 @@ public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): Closea
 
     private fun writeDuty(duty: Int) = initWriter("duty_ns", duty.toString())
 
+    /**
+     * This method is used to set power on servo
+     *
+     * @param power power to set on servo
+     */
     fun setPower(power: Int) {
         val squashedPower = Helpers.limit(-100, 100, power)
         val range: Int
@@ -36,6 +49,11 @@ public class ServoMotor(val servoPath: ServoPorts, val type : ServoType): Closea
         writeDuty(duty)
     }
 
+    /**
+     * This method is used to set servo's power to zero
+     *
+     * Basically, this is setPower(0)
+     */
     fun setZero() {
         writeDuty(type.zero)
     }

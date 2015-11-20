@@ -42,12 +42,18 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
 
     abstract fun parse(bytes: ByteArray, offset: Int): Optional<T>
 
+    /**
+     * This method is used to start the sensor
+     */
     open fun start() {
         if (isStarted == true) throw Exception("Calling start() second time is prohibited")
         loop()
         isStarted = true
     }
 
+    /**
+     * This method is used to read values from sensor
+     */
     fun read(): T? {
         if (isStarted == false) {
             println("TrikKotlin: Starting the sensor for you!")
@@ -75,14 +81,27 @@ abstract class BinaryFifoSensor<T>(val path: String, val dataSize: Int, val bufS
         return result
     }
 
+    /**
+     * This method is used to stop the sensor
+     */
     fun stop() {
         if (isStarted == false) throw Exception("Calling stop() before start() is prohibited")
         close()
         subject = PublishSubject.create<T>()
     }
 
+    /**
+     * This method returns sensor output as rx observable
+     *
+     * @return rx observable
+     */
     fun toObservable() = subject.asObservable()
 
+    /**
+     * This method is used to close the sensor
+     *
+     * NB: we assume we will not use sensor anymore and freeing all resources
+     */
     override fun close() {
         if (isStarted == true) {
             isClosing = true

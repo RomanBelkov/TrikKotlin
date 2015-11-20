@@ -37,6 +37,13 @@ open class VideoSensorOutput private constructor() {
 
 }
 
+/**
+ * This class represents abstract TRIK video sensor
+ *
+ * @param scriptPath starting script path
+ * @param commandPath input sensor fifo
+ * @param sensorPath output sensor fifo
+ */
 abstract class VideoSensor(val scriptPath: String, val commandPath: String, sensorPath: String) : StringFifoSensor<VideoSensorOutput>(sensorPath) {
 
     private fun script(command: String) = Shell.send("$scriptPath $command")
@@ -44,6 +51,9 @@ abstract class VideoSensor(val scriptPath: String, val commandPath: String, sens
     private var stream: FileWriter? = null
     private var isCancelled = false
 
+    /**
+     * This value is used to control whether we want to display sensor debug info or not
+     */
     var videoOut = true
         get() = field
         set(p) = when {
@@ -52,24 +62,36 @@ abstract class VideoSensor(val scriptPath: String, val commandPath: String, sens
             else           -> { stream?.write("video_out ${if (p == true) 1 else 0}"); stream?.flush(); field = p }
         }
 
+    /**
+     * This method is used to start the sensor
+     */
     override fun start() {
         script("start")
         super.start()
         stream = FileWriter(commandPath)
     }
 
+    /**
+     * This method is used to send detect command to sensor
+     */
     fun detect() {
         if (stream == null) throw Exception("Missing Start() call before calling Detect()")
         stream?.write("detect\n")
         stream?.flush()
     }
 
+    /**
+     * This method is used to catch detected info and then re-send it to sensor
+     */
     fun setDetectTarget(target: VideoSensorOutput.DetectTarget) {
         if (stream == null) throw Exception("Missing Start() call before calling SetDetectTarget()")
         stream?.write(target.toString())
         stream?.flush()
     }
 
+    /**
+     * This method is used to stop the sensor
+     */
     override fun stop() {
         stream?.close()
         super.stop()

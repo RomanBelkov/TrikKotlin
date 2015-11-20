@@ -4,8 +4,21 @@ import java.util.*
  * Created by Roman Belkov on 10.10.15.
  */
 
+
+/**
+ * This class represents object tracking TRIK video sensor
+ *
+ * @param scriptPath starting script path
+ * @param commandPath input sensor fifo
+ * @param sensorPath output sensor fifo
+ */
 class ObjectSensor(scriptPath: String, commandPath: String, sensorPath: String) : VideoSensor(scriptPath, commandPath, sensorPath) {
 
+    /**
+     * This class represents object tracking TRIK video sensor
+     *
+     * @param videoSource source of video (USB cam or video module)
+     */
     constructor(videoSource: VideoSource) : this(
         when(videoSource) {
             VideoSource.USB  -> "/etc/init.d/object-sensor-webcam.sh"

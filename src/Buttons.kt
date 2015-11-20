@@ -29,8 +29,16 @@ class ButtonEvent(val button: ButtonEventCode, val isPressed: Boolean) {
     override fun toString() = "${button.toString()} ${isPressed.toString()}"
 }
 
+/**
+ * This class represents on-board buttons
+ *
+ * @param deviceFilePath path to device file
+ */
 class Buttons(deviceFilePath: String) : BinaryFifoSensor<ButtonEvent>(deviceFilePath, 16, 1024) {
 
+    /**
+     * This class represents on-board buttons
+     */
     constructor() : this("/dev/input/event0")
 
     var clicksOnly = true
