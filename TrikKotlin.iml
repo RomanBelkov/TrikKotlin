@@ -8,6 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
-    <orderEntry type="library" name="rxjava-1.0.14" level="project" />
+    <orderEntry type="library" name="io.reactivex:rxjava:1.1.5" level="project" />
   </component>
 </module>
